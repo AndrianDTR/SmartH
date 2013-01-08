@@ -6,5 +6,5 @@
 		$content = file_get_contents($content_file);
 		$result = explode('\n', $content);
 	}
-	return lson_encode($result);
+	return json_encode($result);
 ?>
