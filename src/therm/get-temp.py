@@ -12,7 +12,7 @@ class Therm:
 	loadedModules = ['w1-gpio', 'w1-therm']
 	dbCon = None
 
-	def __init__(self, modules):
+	def __init__(self, modules = None):
 		self.dbCon = self.dbConnect('localhost', 'therm', 'therm', 'therm')
 		
 		if modules:
@@ -99,13 +99,16 @@ class Therm:
 			except IOError:
 				loadMissedModules()
 		
-		updateDbSensors(w1dev)
+		self.updateDbSensors(w1dev)
 		
 	def updateDbSensors(self, sensors):
 		print "Update DB sensors list"
 		for sensor in sensors:
+			sensor = long(sensor.replace('-',''), 16)
+			print sensor
 			cur = self.dbCon.cursor()
-			cur.execute("select Id form 1wSensors where Id <> {0}".format(sensor))
+			cur.execute("select Id from 1wSensors where Id <> {0}".format(sensor))
+
 			id = cur.fetchone()
 			print id
 		
@@ -123,10 +126,7 @@ class Therm:
 	
 def main(argv):
 	therm = Therm()
-	
 	print "main"
-	dbCon = dbConnect('localhost', 'therm', 'therm', 'therm')
-	print dbCon
 	
 	try:
 		opts, args = getopt.getopt(argv[1:],"hmr",["load-modules", "nenew-sensor-list"])
