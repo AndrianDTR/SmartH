@@ -8,118 +8,125 @@ import MySQLdb as mdb
 
 #import 
 
-loadedModules = ['w1-gpio', 'w1-therm']
-dbCon = None
+class Therm:
+	loadedModules = ['w1-gpio', 'w1-therm']
+	dbCon = None
 
-def dbConnect(host, db, user, passwd):
-	conn = None
-	try:
-		conn = mdb.connect(host, user, passwd, db)
-	except mdb.Error, e:
-	    print "Error %d: %s" % (e.args[0], e.args[1])
-	    sys.exit(1)
-	return conn
-	
-def loadMissedModules():
-	res, missed = checkModules(loadedModules)
-	if not res:
-		for module in missed:
-			loadModule(module)
-			
-def loadSettings(file):
-	consts = {}
-	with open('consts.py', 'r') as const_file:
-		for line in const_file:
-			data = line.split('=')
-			
-			if len(data) > 1:
-				consts[data[0].strip()] = data[1].strip()
-
-	return consts
-
-def checkModules(modules):
-	print "checkModules"
-	missed = []
-	res = True
-	with open("/proc/modules") as loadedModules:
-		for module in modules:
-			if not module in loadedModules:
-				res = False
-				missed.append(module)
-	
-	return res, missed
+	def __init__(self, modules):
+		self.dbCon = self.dbConnect('localhost', 'therm', 'therm', 'therm')
 		
-def loadModule(module):
-	print "Load module", module
-	os.system("sudo modprobe {0}".format(module))
-	
-	
-"""
-$output = "";
-$attempts = 0;
-while ($output !~ /YES/g && $attempts < 5)
-{
-        $output = `sudo cat /sys/bus/w1/devices/28-*/w1_slave 2>&1`;
-        if($output =~ /No such file or directory/)
-        {
-                print "Could not find DS18B20\n";
-                last;
-        }
-        elsif($output !~ /NO/g)
-        {
-                $output =~ /t=(\d+)/i;
-                $temp = ($is_celsius) ? ($1 / 1000) : ($1 / 1000) * 9/5 + 32;
-                $rrd = `/usr/bin/rrdtool update $dir/hometemp.rrd N:$temp:$outtemp`;
-        }
- 
-        $attempts++;
-}
- 
-#print "Inside temp: $temp\n";
-#print "Outside temp: $outtemp\n";
-"""
-
-
-def renewSensorsList():
-	print "renewSensorsList"
-	w1dev = []
-	
-	while True:
+		if modules:
+			self.loadedModules = modules
+			
+	def dbConnect(self, host, db, user, passwd):
+		conn = None
 		try:
-			with open('/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves', 'r') as sensors_file:
-				w1dev = sensors_file.readlines()
-			break
-		except IOError:
-			loadMissedModules()
-	return w1dev
-	
-def updateDbSensors(sensors):
-	global dbCon
-	
-	print "Update DB sensors list"
-	for sensor in sensors:
-		cur = dbCon.cursor()
-		cur.execute("select Id form 1wSensors where Id <> {0}".format(sensor))
-		id = cur.fetchone()
-		print id
-	
-def getSensorsList():
-	print "getSensorsList"
+			conn = mdb.connect(host, user, passwd, db)
+		except mdb.Error, e:
+		    print "Error %d: %s" % (e.args[0], e.args[1])
+		    sys.exit(1)
+		return conn
+		
+	def loadMissedModules(self):
+		res, missed = checkModules(loadedModules)
+		if not res:
+			for module in missed:
+				loadModule(module)
+				
+	def loadSettings(self, file):
+		consts = {}
+		with open('consts.py', 'r') as const_file:
+			for line in const_file:
+				data = line.split('=')
+				
+				if len(data) > 1:
+					consts[data[0].strip()] = data[1].strip()
 
-def getSensorTemp(id):
-	print "getSensorTemp"
+		return consts
 
-def setHeaterState(state):
-	print "Set heater state"
+	def checkModules(self, modules):
+		print "checkModules"
+		missed = []
+		res = True
+		with open("/proc/modules") as loadedModules:
+			for module in modules:
+				if not module in loadedModules:
+					res = False
+					missed.append(module)
+		
+		return res, missed
+			
+	def loadModule(self, module):
+		print "Load module", module
+		os.system("sudo modprobe {0}".format(module))
+		
+		
+	"""
+	$output = "";
+	$attempts = 0;
+	while ($output !~ /YES/g && $attempts < 5)
+	{
+		$output = `sudo cat /sys/bus/w1/devices/28-*/w1_slave 2>&1`;
+		if($output =~ /No such file or directory/)
+		{
+			print "Could not find DS18B20\n";
+			last;
+		}
+		elsif($output !~ /NO/g)
+		{
+			$output =~ /t=(\d+)/i;
+			$temp = ($is_celsius) ? ($1 / 1000) : ($1 / 1000) * 9/5 + 32;
+			$rrd = `/usr/bin/rrdtool update $dir/hometemp.rrd N:$temp:$outtemp`;
+		}
+	 
+		$attempts++;
+	}
+	 
+	#print "Inside temp: $temp\n";
+	#print "Outside temp: $outtemp\n";
+	"""
 
-def run():
-	print "Run..."
+
+	def renewSensorsList(self):
+		print "renewSensorsList"
+		w1dev = []
+		
+		while True:
+			try:
+				with open('/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves', 'r') as sensors_file:
+					w1dev = sensors_file.readlines()
+				break
+			except IOError:
+				loadMissedModules()
+		
+		updateDbSensors(w1dev)
+		
+	def updateDbSensors(self, sensors):
+		print "Update DB sensors list"
+		for sensor in sensors:
+			cur = self.dbCon.cursor()
+			cur.execute("select Id form 1wSensors where Id <> {0}".format(sensor))
+			id = cur.fetchone()
+			print id
+		
+	def getSensorsList(self):
+		print "getSensorsList"
+
+	def getSensorTemp(self, id):
+		print "getSensorTemp"
+
+	def setHeaterState(self, state):
+		print "Set heater state"
+
+	def run(self):
+		print "Run..."
 	
 def main(argv):
-	global dbCon
+	therm = Therm()
 	
 	print "main"
 	dbCon = dbConnect('localhost', 'therm', 'therm', 'therm')
+	print dbCon
 	
 	try:
 		opts, args = getopt.getopt(argv[1:],"hmr",["load-modules", "nenew-sensor-list"])
@@ -132,11 +139,10 @@ def main(argv):
 			sys.exit()
 		elif opt in ("-m", "--load-modules"):
 			print "Load modules"
-			loadMissedModules()
+			therm.loadMissedModules()
 		elif opt in ("-r", "--renew-sensor-list"):
 			print "Renew sensors"
-			sensors = renewSensorsList()
-			updateDbSensors(sensors)
+			therm.renewSensorsList()
 		else:
 			run()
 
