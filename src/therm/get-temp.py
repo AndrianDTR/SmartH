@@ -104,16 +104,23 @@ class Therm:
 	def updateDbSensors(self, sensors):
 		print "Update DB sensors list"
 		for sensor in sensors:
-			sensor = long(sensor.replace('-',''), 16)
-			print sensor
+			sensorId = long(sensor.replace('-',''), 16)
 			cur = self.dbCon.cursor()
-			cur.execute("select Id from 1wSensors where Id <> {0}".format(sensor))
+			cur.execute("select Id from 1wSensors where Id <> {0}".format(sensorId))
 
-			id = cur.fetchone()
-			print id
+			if not cur.fetchone():
+				cur = self.dbCon.cursor()
+				cur.execute("insert into 1wSensors(Id, Name) values({0},{1})".format(sensorId, sensor))
 		
 	def getSensorsList(self):
 		print "getSensorsList"
+		sensors = []
+		
+		cur = self.dbCon.cursor()
+		cur.execute("select * from 1wSensors")
+		table = cur.fetchone()
+		
+		return table
 
 	def getSensorTemp(self, id):
 		print "getSensorTemp"
@@ -123,6 +130,9 @@ class Therm:
 
 	def run(self):
 		print "Run..."
+		for row in table:
+			print row
+		
 	
 def main(argv):
 	therm = Therm()
