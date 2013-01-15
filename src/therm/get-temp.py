@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 import os
+import sys
+import getopt
+
 #import 
 
 def loadSettings(file):
@@ -24,6 +27,7 @@ def checkModules(modules):
 				res = False
 				missed.append(module)
 	
+	print "Res: ", res, missed
 	return res, missed
 		
 def loadModule(module):
@@ -64,13 +68,30 @@ def getSensorsList():
 def setHeaterState(state):
 	print "Set heater state"
 
-def main():
+def run():
+	print "Run..."
+	
+def main(argv):
 	print "main"
-	res, missed = checkModules(['w1-gpio', 'w1-therm'])
-	if not res:
-		for module in missed:
-			loadModule(module)
+	
+	try:
+		opts, args = getopt.getopt(argv[1:],"hm",["load-modules"])
+	except getopt.GetoptError:
+		print 'get-temp.py -m '
+		sys.exit(2)
+	for opt, arg in opts:
+		if opt == '-h':
+			print 'test.py -m'
+			sys.exit()
+		elif opt in ("-m", "--load-modules"):
+			print "Load modules"
+			res, missed = checkModules(['w1-gpio', 'w1-therm'])
+			if not res:
+				for module in missed:
+					loadModule(module)
+		else:
+			run()
 
 if __name__ == '__main__':
-	main()
+	main(sys.argv)
 
