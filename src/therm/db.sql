@@ -10,71 +10,73 @@
 /*!40101 SET NAMES utf8 */;
 /*!40014 SET FOREIGN_KEY_CHECKS=0 */;
 
+grant all on therm.* to 'therm'@'localhost' identified by 'therm';
+
 -- Dumping database structure for therm
 DROP DATABASE IF EXISTS `therm`;
 CREATE DATABASE IF NOT EXISTS `therm` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `therm`;
 
 
--- Dumping structure for table therm.1wSensors
-DROP TABLE IF EXISTS `1wSensors`;
-CREATE TABLE IF NOT EXISTS `1wSensors` (
-  `Id` bigint(20) unsigned NOT NULL DEFAULT '0',
+-- Dumping structure for table therm.DeviceTypes
+DROP TABLE IF EXISTS `DeviceTypes`;
+CREATE TABLE IF NOT EXISTS `DeviceTypes` (
+  `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `Name` varchar(50) DEFAULT NULL,
-  `Type` int(10) DEFAULT NULL,
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data for table therm.1wSensors: ~0 rows (approximately)
-DELETE FROM `1wSensors`;
-/*!40000 ALTER TABLE `1wSensors` DISABLE KEYS */;
-/*!40000 ALTER TABLE `1wSensors` ENABLE KEYS */;
+DELETE FROM `DeviceTypes`;
+insert into `DeviceTypes`(`Name`) values('DS18B20'),('DS2413');
+/*!40000 ALTER TABLE `DeviceTypes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `DeviceTypes` ENABLE KEYS */;
 
-
--- Dumping structure for table therm.1wSwitchs
-DROP TABLE IF EXISTS `1wSwitchs`;
-CREATE TABLE IF NOT EXISTS `1wSwitchs` (
+-- Dumping structure for table therm.1wDevices
+DROP TABLE IF EXISTS `1wDevices`;
+CREATE TABLE IF NOT EXISTS `1wDevices` (
   `Id` bigint(20) unsigned NOT NULL DEFAULT '0',
-  `Name` varchar(50) CHARACTER SET latin1 DEFAULT NULL,
-  `Type` int(11) DEFAULT NULL,
-  PRIMARY KEY (`Id`)
+  `Name` varchar(50) DEFAULT NULL,
+  `Type` int(10) unsigned DEFAULT 1,
+  `Direction` enum('In', 'Out') DEFAULT 'In',
+  PRIMARY KEY (`Id`),
+  CONSTRAINT `FK_DeviceType_1wDevice` FOREIGN KEY (`Type`) REFERENCES `DeviceTypes` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
--- Dumping data for table therm.1wSwitchs: ~0 rows (approximately)
-DELETE FROM `1wSwitchs`;
-/*!40000 ALTER TABLE `1wSwitchs` DISABLE KEYS */;
-/*!40000 ALTER TABLE `1wSwitchs` ENABLE KEYS */;
-
+-- Dumping data for table therm.1wSensors: ~0 rows (approximately)
+DELETE FROM `1wDevices`;
+/*!40000 ALTER TABLE `1wDevices` DISABLE KEYS */;
+/*!40000 ALTER TABLE `1wDevices` ENABLE KEYS */;
 
 -- Dumping structure for table therm.SensorValues
-DROP TABLE IF EXISTS `SensorValues`;
-CREATE TABLE IF NOT EXISTS `SensorValues` (
-  `SensorId` bigint(20) unsigned DEFAULT NULL,
+DROP TABLE IF EXISTS `DeviceValues`;
+CREATE TABLE IF NOT EXISTS `DeviceValues` (
+  `DeviceId` bigint(20) unsigned DEFAULT NULL,
   `TimeMark` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `Value` timestamp NULL DEFAULT NULL,
-  KEY `TimeMark` (`TimeMark`,`SensorId`),
-  KEY `FK_SensorValues_1wSensors` (`SensorId`),
-  CONSTRAINT `FK_SensorValues_1wSensors` FOREIGN KEY (`SensorId`) REFERENCES `1wSensors` (`Id`)
+  `Value` int(10) unsigned DEFAULT NULL,
+  KEY `TimeMark` (`TimeMark`,`DeviceId`),
+  KEY `FK_DeviceValues_1wDevices` (`DeviceId`),
+  CONSTRAINT `FK_DeviceValues_1wDevice` FOREIGN KEY (`DeviceId`) REFERENCES `1wDevices` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data for table therm.SensorValues: ~0 rows (approximately)
-DELETE FROM `SensorValues`;
-/*!40000 ALTER TABLE `SensorValues` DISABLE KEYS */;
-/*!40000 ALTER TABLE `SensorValues` ENABLE KEYS */;
+DELETE FROM `DeviceValues`;
+/*!40000 ALTER TABLE `DeviceValues` DISABLE KEYS */;
+/*!40000 ALTER TABLE `DeviceValues` ENABLE KEYS */;
 
 
 -- Dumping structure for table therm.SwitchsState
-DROP TABLE IF EXISTS `SwitchsState`;
-CREATE TABLE IF NOT EXISTS `SwitchsState` (
+DROP TABLE IF EXISTS `DevicesState`;
+CREATE TABLE IF NOT EXISTS `DevicesState` (
   `Id` bigint(20) unsigned DEFAULT NULL,
   `Value` int(10) DEFAULT NULL,
   UNIQUE KEY `Id` (`Id`),
-  CONSTRAINT `FK_SwitchsState_1wSwitchs` FOREIGN KEY (`Id`) REFERENCES `1wSwitchs` (`Id`)
+  CONSTRAINT `FK_DevicesState_1wDevices` FOREIGN KEY (`Id`) REFERENCES `1wDevices` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data for table therm.SwitchsState: ~0 rows (approximately)
-DELETE FROM `SwitchsState`;
-/*!40000 ALTER TABLE `SwitchsState` DISABLE KEYS */;
-/*!40000 ALTER TABLE `SwitchsState` ENABLE KEYS */;
+DELETE FROM `DevicesState`;
+/*!40000 ALTER TABLE `DevicesState` DISABLE KEYS */;
+/*!40000 ALTER TABLE `DevicesState` ENABLE KEYS */;
 /*!40014 SET FOREIGN_KEY_CHECKS=1 */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
