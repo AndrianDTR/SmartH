@@ -141,7 +141,7 @@ class Therm:
 		if table:
 			print table
 			for row in table:
-				print self.getDeviceValue(row['Id'])
+				print row['Name'], " = ", self.getDeviceValue(row['Id'])
 				#print row
 		
 	
