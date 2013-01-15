@@ -86,14 +86,16 @@ def renewSensorsList():
 	
 	while True:
 		try:
-			with open('cat /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves', 'r') as const_file:
-				w1dev = const_file
+			with open('/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves', 'r') as sensors_file:
+				w1dev = sensors_file.readlines()
 			break
 		except IOError:
 			loadMissedModules()
 	return w1dev
 	
 def updateDbSensors(sensors):
+	global dbCon
+	
 	print "Update DB sensors list"
 	for sensor in sensors:
 		cur = dbCon.cursor()
@@ -114,6 +116,8 @@ def run():
 	print "Run..."
 	
 def main(argv):
+	global dbCon
+	
 	print "main"
 	dbCon = dbConnect('localhost', 'therm', 'therm', 'therm')
 	
