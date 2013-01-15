@@ -14,13 +14,12 @@ class Therm:
 
 	def __init__(self, modules = None):
 		self.dbCon = self.dbConnect('localhost', 'therm', 'therm', 'therm')
-		#self.loadMissedModules()
+		self.loadMissedModules()
 		
 		if modules:
 			self.loadedModules = modules
 			
 	def dbConnect(self, host, db, user, passwd):
-		print "Connect"
 		conn = None
 		try:
 			conn = mdb.connect(host, user, passwd, db)
@@ -48,7 +47,6 @@ class Therm:
 		return consts
 
 	def checkModules(self, modules):
-		print "checkModules"
 		missed = []
 		res = True
 		with open("/proc/modules") as loadedModules:
@@ -64,7 +62,6 @@ class Therm:
 		os.system("sudo modprobe {0}".format(module))
 		
 	def renewDevicesList(self):
-		print "renewDevicesList"
 		w1dev = []
 		
 		try:
@@ -76,7 +73,6 @@ class Therm:
 		self.updateDbDevices(w1dev)
 		
 	def updateDbDevices(self, devices):
-		print "Update DB devices list"
 		for device in devices:
 			devId = long(device.replace('-',''), 16)
 			try:
@@ -93,44 +89,60 @@ class Therm:
 		self.dbCon.commit()
 	
 	def getDeviceTypes(self):
-		print "Get device types"
-		
 		types = []
 		try:
 			cur = self.dbCon.cursor()
 			cur.execute("select * from `DeviceTypes`")
-			types = cur.fetchall()
+			for data in cur.fetchall():
+				types = append({'Id':data[0], 'Name':data[1]})
 		except mdb.Error, e:
 			print "Error %d: %s" % (e.args[0], e.args[1])
 	
 		return types
 			
 	def getDevicesList(self):
-		print "getDevicesList"
-		
 		devices = []
 		try:
 			cur = self.dbCon.cursor()
-			cur.execute("select * from 1wDevices")
-			devices = cur.fetchall()
+			cur.execute("select `Id`,`Name`,`Type`,`Direction` from 1wDevices")
+			for data in cur.fetchall():
+				devices.append({'Id':data[0], 'Name':data[1], 'Type':data[2], 'Direction':data[3]})
 		except mdb.Error, e:
 			print "Error %d: %s" % (e.args[0], e.args[1])
 			
 		return devices
 
-	def getSensorTemp(self, id):
-		print "getSensorTemp"
+	def getDeviceValue(self, id):
+		return self.getTemp(id)
 
-	def setHeaterState(self, state):
-		print "Set heater state"
+	def getTemp(self, id):
+		devId = hex(id)[2:][:-1]
+		devId = devId[:2] + "-" + devId[2:]
+		filename="/sys/bus/w1/devices/"+devId+"/w1_slave"
+		temperature = 0
+		try:
+			with open(filename, 'r') as tfile:
+				text = tfile.read()
+				secondline = text.split("\n")[1]
+				temperaturedata= secondline.split(" ")[9]
+				temperature = float(temperaturedata[2:])
+				temperature = temperature / 1000
+		except IOError:
+			print "Device read value error. Device ID:", devId
+		
+		return temperature
+
+	def setDeviceValue(self, value):
+		print "Set device value"
 
 	def run(self):
 		print "Run..."
 		table = self.getDevicesList()
-		print table
 		if table:
+			print table
 			for row in table:
-				print row
+				print self.getDeviceValue(row['Id'])
+				#print row
 		
 	
 def main(argv):
