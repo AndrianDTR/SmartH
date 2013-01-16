@@ -5,6 +5,7 @@ import os
 import time
 import atexit
 from signal import SIGTERM
+from error import *
 
 import therm
 

@@ -2,14 +2,14 @@
 
 import sys
 import time
-from therm import *
+from deviceList import *
 from daemon import Daemon
 
 class MyDaemon(Daemon):
-	therm = Therm()
+	devices = DeviceList()
 	
 	def storeDeviceValues(self):
-		devices = self.therm.getDeviceList()
+		devices = self.devices.getDeviceList()
 		if devices:
 			print devices
 			for row in devices:
@@ -30,7 +30,7 @@ class MyDaemon(Daemon):
 			time.sleep(1)
 	
 	def refresh(self):
-		pass
+		self.devices.renewDeviceList()
 
 if __name__ == "__main__":
 	daemon = MyDaemon('/tmp/thermd.pid', )
@@ -42,7 +42,7 @@ if __name__ == "__main__":
 		elif 'restart' == sys.argv[1]:
 			daemon.restart()
 		elif 'refresh' == sys.argv[1]:
-			daemon.restart()
+			daemon.refresh()
 		else:
 			print "Unknown command.\nUsage: main.py start|stop|restart|refresh"
 			sys.exit(2)

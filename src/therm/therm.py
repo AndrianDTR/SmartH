@@ -16,16 +16,6 @@ class Therm:
 		if modules:
 			self.loadedModules = modules
 			
-	def dbConnect(self, host, db, user, passwd):
-		conn = None
-		try:
-			conn = mdb.connect(host, user, passwd, db)
-		except mdb.Error, e:
-		    print "Error %d: %s" % (e.args[0], e.args[1])
-		    sys.exit(1)
-		    
-		return conn
-		
 	def loadMissedModules(self):
 		res, missed = self.checkModules(self.loadedModules)
 		if not res:

@@ -21,26 +21,27 @@ USE `therm`;
 -- Dumping structure for table therm.DeviceTypes
 DROP TABLE IF EXISTS `DeviceTypes`;
 CREATE TABLE IF NOT EXISTS `DeviceTypes` (
-  `Id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `Code` int(10) unsigned NOT NULL,
   `Name` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`Id`)
+  PRIMARY KEY (`Code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data for table therm.1wSensors: ~0 rows (approximately)
 DELETE FROM `DeviceTypes`;
-insert into `DeviceTypes`(`Name`) values('DS18B20'),('DS2413');
+insert into `DeviceTypes`(`Code`,`Name`) values(28,'DS18B20'),(24,'DS2413');
 /*!40000 ALTER TABLE `DeviceTypes` DISABLE KEYS */;
 /*!40000 ALTER TABLE `DeviceTypes` ENABLE KEYS */;
 
 -- Dumping structure for table therm.1wDevices
 DROP TABLE IF EXISTS `1wDevices`;
 CREATE TABLE IF NOT EXISTS `1wDevices` (
-  `Id` bigint(20) unsigned NOT NULL DEFAULT '0',
+  `Type` int(10) unsigned,
+  `Id` bigint(20) unsigned,
   `Name` varchar(50) DEFAULT NULL,
-  `Type` int(10) unsigned DEFAULT 1,
   `Direction` enum('In', 'Out') DEFAULT 'In',
-  PRIMARY KEY (`Id`),
-  CONSTRAINT `FK_DeviceType_1wDevice` FOREIGN KEY (`Type`) REFERENCES `DeviceTypes` (`Id`)
+  KEY `Type` (`Type`,`Id`),
+  KEY `FK_DeviceType_1wDevice` (`Type`),
+  CONSTRAINT `FK_DeviceType_1wDevice` FOREIGN KEY (`Type`) REFERENCES `DeviceTypes` (`Code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data for table therm.1wSensors: ~0 rows (approximately)
@@ -51,12 +52,14 @@ DELETE FROM `1wDevices`;
 -- Dumping structure for table therm.SensorValues
 DROP TABLE IF EXISTS `DeviceValues`;
 CREATE TABLE IF NOT EXISTS `DeviceValues` (
-  `DeviceId` bigint(20) unsigned DEFAULT NULL,
+  `Type` int(10) unsigned,
+  `DeviceId` bigint(20) unsigned,
   `TimeMark` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `Value` int(10) unsigned DEFAULT NULL,
   KEY `TimeMark` (`TimeMark`,`DeviceId`),
-  KEY `FK_DeviceValues_1wDevices` (`DeviceId`),
-  CONSTRAINT `FK_DeviceValues_1wDevice` FOREIGN KEY (`DeviceId`) REFERENCES `1wDevices` (`Id`)
+  KEY `FK_DeviceValuesDeviceId_1wDevices` (`DeviceId`,`Type`),
+  CONSTRAINT `FK_DeviceValuesDeviceId_1wDevices` FOREIGN KEY (`DeviceId`) REFERENCES `1wDevices` (`Id`),
+  CONSTRAINT `FK_DeviceValuesType_1wDevices` FOREIGN KEY (`Type`) REFERENCES `1wDevices` (`Type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Dumping data for table therm.SensorValues: ~0 rows (approximately)
