@@ -2,11 +2,8 @@
 
 import os
 import sys
-import getopt
 
 import MySQLdb as mdb
-
-#import 
 
 class Therm:
 	loadedModules = ['w1-gpio', 'w1-therm']
@@ -134,36 +131,3 @@ class Therm:
 
 	def setDeviceValue(self, value):
 		print "Set device value"
-
-	def run(self):
-		print "Run..."
-		table = self.getDevicesList()
-		if table:
-			print table
-			for row in table:
-				print row['Name'], " = ", self.getDeviceValue(row['Id'])
-				#print row
-		
-	
-def main(argv):
-	therm = Therm()
-	print "main"
-	
-	try:
-		opts, args = getopt.getopt(argv[1:],"hr",["nenew-sensor-list"])
-	except getopt.GetoptError:
-		print 'get-temp.py -r '
-		sys.exit(2)
-	for opt, arg in opts:
-		if opt == '-h':
-			print 'test.py -r'
-			sys.exit()
-		elif opt in ("-r", "--renew-sensor-list"):
-			print "Renew sensors"
-			therm.renewDevicesList()
-	
-	therm.run()
-
-if __name__ == '__main__':
-	main(sys.argv)
-
