@@ -23,7 +23,7 @@ class DB(Singleton):
 		try:
 			conn = mdb.connect(host, user, passwd, db)
 		except mdb.Error, e:
-			raise Error("Error {0}: {1}".format(e.args[0], e.args[1]))
+			raise MyError("Error {0}: {1}".format(e.args[0], e.args[1]))
 		self.conn = conn
 	
 	def close(self):
@@ -34,12 +34,12 @@ class DB(Singleton):
 	def execute(self, statement):
 		try:
 			if not self.conn:
-				raise Error("Error! No connection to DB.")
+				raise MyError("Error! No connection to DB.")
 			
 			cur = self.conn.cursor()
 			cur.execute(statement)
 		except mdb.Error, e:
-			raise Error("Error {0}: {1}".format(e.args[0], e.args[1]))
+			raise MyError("Error {0}: {1}".format(e.args[0], e.args[1]))
 		
 		return cur
 	

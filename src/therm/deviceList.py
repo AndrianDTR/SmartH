@@ -32,11 +32,11 @@ class DeviceList(Singleton):
 			(devType, devId) = device.split('-')
 			devId = long(devId, 16)
 			try:
-				cur = self.db.execute("select Type,Id from 1wDevices where Id={0} and Type={1}".format(devId, devType))
+				cur = self.db.execute("select `Type`, `DeviceId` from `1wDevices` where `DeviceId`={0} and `Type`={1}".format(devId, devType))
 				
 				data = cur.fetchone()
 				if not data:
-					stat = "insert into `1wDevices`(`Type`, `Id`, `Name`) values({0}, {1}, '{2}')".format(devType, devId, device.strip())
+					stat = "insert into `1wDevices`(`Type`, `DeviceId`, `Name`) values({0}, {1}, '{2}')".format(devType, devId, device.strip())
 					self.db.execute(stat)
 			except MyError as e:
 				print e
@@ -46,9 +46,11 @@ class DeviceList(Singleton):
 	def getDevicesList(self):
 		self.devices = []
 		try:
-			cur = self.db.execute("select `Type`,`Id`,`Name`,`Direction` from `1wDevices`")
+			cur = self.db.execute("select `Type`,`DeviceId`,`Name`,`Direction` from `1wDevices`")
 			for data in cur.fetchall():
-				devices.append({'Type':data[0], 'Id':data[1], 'Name':data[2], 'Direction':data[3]})
+				devId = str(hex(data[1])[2:-1]).zfill(12)
+				self.devices.append({'Type':data[0], 'Id':devId,  'Name':data[2], 'Direction':data[3]})
 		except MyError as e:
 			print e
-			
+		print self.devices
+		return self.devices
