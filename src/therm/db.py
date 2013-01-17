@@ -37,7 +37,7 @@ class DB(Singleton):
 				raise Error("Error! No connection to DB.")
 			
 			cur = self.conn.cursor()
-			cur.execute("select Id from 1wDevices where Id={0}".format(devId))
+			cur.execute(statement)
 		except mdb.Error, e:
 			raise Error("Error {0}: {1}".format(e.args[0], e.args[1]))
 		

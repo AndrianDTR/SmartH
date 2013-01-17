@@ -2,36 +2,49 @@
 
 import sys
 import time
+from error import MyError
 from deviceList import *
 from daemon import Daemon
 
 class MyDaemon(Daemon):
-	devices = DeviceList()
+	devices = None
 	
 	def storeDeviceValues(self):
-		devices = self.devices.getDeviceList()
-		if devices:
-			print devices
-			for row in devices:
+		devList = self.devices.getDeviceList()
+		if devList:
+			print devList
+			for row in devList:
 				if row['Direction'] == 'In':
 					print row['Name'], " = ", self.getDeviceValue(row['Id'])
 					print row
 		
 	def run(self):
-		count = 0
-		while True:
-			if count == 0:
-				self.storeDeviceValues()
+		try:
+			self.devices = DeviceList()
+			self.devices.renewDevicesList()
+			count = 0
+			while True:
+				if count == 0:
+					self.storeDeviceValues()
+				
+				if count == 59:
+					count = 0
+				else:
+					count += 1
+				time.sleep(1)
+		except Error as e:
+			print e
+		except Exception as e:
+			print e
+			exit(1)
 			
-			if count == 59:
-				count = 0
-			else:
-				count += 1
-			time.sleep(1)
-	
 	def refresh(self):
-		self.devices.renewDeviceList()
-
+		try:
+			self.devices = DeviceList()
+			self.devices.renewDevicesList()
+		except MyError as e:
+			print e
+		
 if __name__ == "__main__":
 	daemon = MyDaemon('/tmp/thermd.pid', )
 	if len(sys.argv) == 2:
