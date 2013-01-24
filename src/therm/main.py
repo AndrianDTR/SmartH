@@ -9,12 +9,20 @@ from daemon import Daemon
 class MyDaemon(Daemon):
 	devices = None
 	
+	def __init__(self, *kwargs):
+		print "AAAA"
+		super(MyDaemon, self).__init__(*kwargs)
+		db = DB()
+		db.connect('localhost', 'therm', 'therm', 'therm')
+		
 	def storeDeviceValues(self):
+		db = DB()
 		devList = self.devices.getDevicesList()
 		if devList:
 			for row in devList:
-				value = row.getValue()
-				print "Value = ", value
+				row['value'] = row.getValue()
+				stat = "insert into `DeviceValues`(`Type`, `DeviceId`, `Value`) values({type}, {id}, {value})".format(row)
+				db.execute(stat)
 				
 			print
 			

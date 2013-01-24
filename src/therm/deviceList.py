@@ -11,8 +11,6 @@ class DeviceList(Singleton):
 	
 	def __init__(self):
 		self.db = DB()
-		self.db.connect('localhost', 'therm', 'therm', 'therm')
-		
 		self.getDevicesList()
 	
 	def refreshDeviceTypes(self):
