@@ -10,6 +10,7 @@ class Device:
 	value = None
 	name = None
 	id = None
+	devModel = None
 	
 	params = {'name':name, 'id':id, 'type':type, 'direction':direction}
 	
@@ -28,6 +29,8 @@ class Device:
 		
 		if not self.type:
 			raise MyError("Error! Device TYPE must be specified.")
+			
+		self.devModel = self.getDeviceObjType()
 		
 	def __repr__(self):
 		return self.name
@@ -38,28 +41,23 @@ class Device:
 	def __setitem__(self, item, value):
 		self[item] = value
 	
-	def getValue4Type(self, type):
-		cur = self.db.execute("select `Get` from `DeviceTypes` where `Code`={0}".format(type))
+	def getDeviceObjType(self):
+		db = DB()
+		cur = db.execute("select `Name` from `DeviceTypes` where `Code`={0}".format(self.type))
+				
 		data = cur.fetchone()
 		if not data:
-			raise MyError("Error! Type '{0}' has no rule to get value.".format(type))
-		
-		return data
-	
-	def setValue4Type(self, type, value):
-		cur = self.db.execute("select `Set` from `DeviceTypes` where `Code`={0}".format(type))
-		data = cur.fetchone()
-		if not data:
-			raise MyError("Error! Type '{0}' has no rule to get value.".format(type))
-		
-		return data
+			raise MyError('Error. Specified type is not registered')
+			
+		cls = data[0]
+		mod = __import__(cls.lower(), fromlist=[cls])
+		return getattr(mod, cls)()
 		
 	def getValue(self):
-		
-		return self.value
+		return self.devModel.getValue(self.id)
 		
 	def setValue(self, value):
-		self.value = value
+		self.devModel.setValue(self.id, value)
 	
 	def getType(self):
 		return self.type

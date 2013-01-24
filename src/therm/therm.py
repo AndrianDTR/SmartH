@@ -55,7 +55,7 @@ class Therm:
 			with open('/sys/bus/w1/devices/w1_bus_master1/w1_master_slaves', 'r') as sensors_file:
 				w1dev = sensors_file.readlines()
 		except IOError:
-			print "1-wire GPIO not loaded."
+			raise MyError("Error! 1-wire GPIO not loaded.")
 		
 		self.updateDbDevices(w1dev)
 		
@@ -71,7 +71,7 @@ class Therm:
 					stat = "insert into `1wDevices`(`Id`, `Name`) values({0}, '{1}')".format(devId, device.strip())
 					cur.execute(stat)
 			except mdb.Error, e:
-				print "Error %d: %s" % (e.args[0], e.args[1])
+				raise MyError("Error %d: %s" % (e.args[0], e.args[1]))
 		
 		self.dbCon.commit()
 	
@@ -83,7 +83,7 @@ class Therm:
 			for data in cur.fetchall():
 				types = append({'Id':data[0], 'Name':data[1]})
 		except mdb.Error, e:
-			print "Error %d: %s" % (e.args[0], e.args[1])
+			raise MyError("Error %d: %s" % (e.args[0], e.args[1]))
 	
 		return types
 			

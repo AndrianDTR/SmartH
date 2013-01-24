@@ -84,13 +84,11 @@ class DeviceList(Singleton):
 		
 	def getDevicesList(self):
 		devices = []
-		try:
-			cur = self.db.execute("select `Type`,`DeviceId`,`Name`,`Direction` from `1wDevices`")
-			for data in cur.fetchall():
-				devId = str(hex(data[1])[2:-1]).zfill(12)
-				dev = Device(type=data, id=devId, name=data[2], direction=data[3])
-				devices.append(dev)
-				self.devices = devices
-		except MyError as e:
-			print e
+		cur = self.db.execute("select `Type`,`DeviceId`,`Name`,`Direction` from `1wDevices`")
+		for data in cur.fetchall():
+			devId = str(hex(data[1])[2:-1]).zfill(12)
+			dev = Device(type=data[0], id=devId, name=data[2], direction=data[3])
+			devices.append(dev)
+			self.devices = devices
+		
 		return self.devices

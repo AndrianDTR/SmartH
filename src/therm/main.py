@@ -13,10 +13,11 @@ class MyDaemon(Daemon):
 		devList = self.devices.getDevicesList()
 		if devList:
 			for row in devList:
-				print row, row.getValue()
-			
+				value = row.getValue()
+				print "Value = ", value
+				
 			print
-		
+			
 	def run(self):
 		try:
 			self.devices = DeviceList()
@@ -24,8 +25,11 @@ class MyDaemon(Daemon):
 
 			count = 0
 			while True:
-				if count == 0:
-					self.storeDeviceValues()
+				try:
+					if count == 0:
+						self.storeDeviceValues()
+				except MyError as e:
+					print e
 				
 				if count == 1:
 					count = 0
