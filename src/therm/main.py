@@ -8,24 +8,29 @@ from daemon import Daemon
 
 class MyDaemon(Daemon):
 	devices = None
-	
-	def __init__(self, *kwargs):
-		print "AAAA"
-		super(MyDaemon, self).__init__(*kwargs)
+	"""
+	pidfile = None
+	stdin = None
+	stdout = None
+	stderr = None
+	#"""
+	def __init__(self, pidfile):
+		Daemon.__init__(self, pidfile, )
 		db = DB()
 		db.connect('localhost', 'therm', 'therm', 'therm')
 		
 	def storeDeviceValues(self):
 		db = DB()
 		devList = self.devices.getDevicesList()
+		
 		if devList:
 			for row in devList:
-				row['value'] = row.getValue()
-				stat = "insert into `DeviceValues`(`Type`, `DeviceId`, `Value`) values({type}, {id}, {value})".format(row)
+				stat = "insert into `DeviceValues`(`Type`, `DeviceId`, `Value`) values({0}, {1}, {2})".format(row.type, row.id, row.getValue())
 				db.execute(stat)
+				db.sync()
 				
 			print
-			
+		
 	def run(self):
 		try:
 			self.devices = DeviceList()
@@ -36,6 +41,7 @@ class MyDaemon(Daemon):
 				try:
 					if count == 0:
 						self.storeDeviceValues()
+						pass
 				except MyError as e:
 					print e
 				

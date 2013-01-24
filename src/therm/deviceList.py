@@ -84,8 +84,7 @@ class DeviceList(Singleton):
 		devices = []
 		cur = self.db.execute("select `Type`,`DeviceId`,`Name`,`Direction` from `1wDevices`")
 		for data in cur.fetchall():
-			devId = str(hex(data[1])[2:-1]).zfill(12)
-			dev = Device(type=data[0], id=devId, name=data[2], direction=data[3])
+			dev = Device(type=data[0], id=data[1], name=data[2], direction=data[3])
 			devices.append(dev)
 			self.devices = devices
 		

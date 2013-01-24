@@ -54,7 +54,8 @@ class Device:
 		return getattr(mod, cls)()
 		
 	def getValue(self):
-		return self.devModel.getValue(self.id)
+		devId = str(hex(self.id)[2:-1]).zfill(12)
+		return self.devModel.getValue(devId)
 		
 	def setValue(self, value):
 		self.devModel.setValue(self.id, value)
