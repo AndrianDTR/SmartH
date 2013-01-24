@@ -10,29 +10,29 @@ class MyDaemon(Daemon):
 	devices = None
 	
 	def storeDeviceValues(self):
-		devList = self.devices.getDeviceList()
+		devList = self.devices.getDevicesList()
 		if devList:
-			print devList
 			for row in devList:
-				if row['Direction'] == 'In':
-					print row['Name'], " = ", self.getDeviceValue(row['Id'])
-					print row
+				print row, row.getValue()
+			
+			print
 		
 	def run(self):
 		try:
 			self.devices = DeviceList()
 			self.devices.renewDevicesList()
+
 			count = 0
 			while True:
 				if count == 0:
 					self.storeDeviceValues()
 				
-				if count == 59:
+				if count == 1:
 					count = 0
 				else:
 					count += 1
 				time.sleep(1)
-		except Error as e:
+		except MyError as e:
 			print e
 		except Exception as e:
 			print e
@@ -41,6 +41,7 @@ class MyDaemon(Daemon):
 	def refresh(self):
 		try:
 			self.devices = DeviceList()
+			self.devices.refreshDeviceTypes()
 			self.devices.renewDevicesList()
 		except MyError as e:
 			print e
