@@ -4,6 +4,7 @@ import sys
 import time
 from error import MyError
 from deviceList import *
+from device import DIRECTION_IN, DIRECTION_OUT, DIRECTION_BOTH
 from daemon import Daemon
 
 class MyDaemon(Daemon):
@@ -18,23 +19,30 @@ class MyDaemon(Daemon):
 		Daemon.__init__(self, pidfile, )
 		db = DB()
 		db.connect('localhost', 'therm', 'therm', 'therm')
+	
+	def setDeviceStates(self):
+		db = DB()
+		devList = self.devices.getDevicesList(DIRECTION_OUT)
+		
+		for row in devList:
+			print str(row)
+			#stat = "insert into `DeviceValues`(`Type`, `DeviceId`, `Value`) values({0}, {1}, {2})".format(row.type, row.id, row.getValue())
+			#db.execute(stat)
+		#db.sync()
+		#"""		
 		
 	def storeDeviceValues(self):
 		db = DB()
-		devList = self.devices.getDevicesList()
+		devList = self.devices.getDevicesList(DIRECTION_IN)
 		
-		if devList:
-			for row in devList:
-				stat = "insert into `DeviceValues`(`Type`, `DeviceId`, `Value`) values({0}, {1}, {2})".format(row.type, row.id, row.getValue())
-				db.execute(stat)
-				db.sync()
-				
-			print
+		for row in devList:
+			stat = "insert into `DeviceValues`(`Type`, `DeviceId`, `Value`) values({0}, {1}, {2})".format(row.type, row.id, row.getValue())
+			db.execute(stat)
+		db.sync()
 		
 	def run(self):
 		try:
-			self.devices = DeviceList()
-			self.devices.renewDevicesList()
+			self.refresh()
 
 			count = 0
 			while True:
@@ -45,11 +53,14 @@ class MyDaemon(Daemon):
 				except MyError as e:
 					print e
 				
-				if count == 1:
+				if count == 59:
 					count = 0
 				else:
 					count += 1
+				
+				self.setDeviceStates()
 				time.sleep(1)
+	
 		except MyError as e:
 			print e
 		except Exception as e:

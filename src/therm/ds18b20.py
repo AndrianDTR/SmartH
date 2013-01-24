@@ -1,8 +1,10 @@
 from error import MyError
+from device import DIRECTION_IN, DIRECTION_OUT, DIRECTION_BOTH
 
 class DS18B20():
 	__name = 'DS18B20'
 	__type = 0x28
+	__direct = DIRECTION_IN
 	
 	def __str__(self):
 		return self.__name
@@ -16,6 +18,9 @@ class DS18B20():
 	def getName(self):
 		return self.__name
 	
+	def getDirection(self):
+		return self.__direct
+		
 	def isOk(self):
 		return True
 		

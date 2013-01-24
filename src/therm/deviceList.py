@@ -11,7 +11,6 @@ class DeviceList(Singleton):
 	
 	def __init__(self):
 		self.db = DB()
-		self.getDevicesList()
 	
 	def refreshDeviceTypes(self):
 		w1Types = []
@@ -31,7 +30,7 @@ class DeviceList(Singleton):
 				
 			data = cur.fetchone()
 			if not data:
-				stat = "insert into `DeviceTypes`(`Code`, `Name`) values({0}, '{1}')".format(type.getType(), type.getName())
+				stat = "insert into `DeviceTypes`(`Code`, `Name`, `Direction`) values({0}, '{1}', '{2}')".format(type.getType(), type.getName(), type.getDirection())
 				self.db.execute(stat)
 		
 		self.db.sync()
@@ -80,12 +79,14 @@ class DeviceList(Singleton):
 		
 		self.db.sync()
 		
-	def getDevicesList(self):
+	def getDevicesList(self, direction):
 		devices = []
-		cur = self.db.execute("select `Type`,`DeviceId`,`Name`,`Direction` from `1wDevices`")
+		stat = "select t1.`Type`,t1.`DeviceId`,t1.`Name` from `1wDevices` t1 join DeviceTypes t2 where t1.Type=t2.Code and t2.Direction='{0}'".format(direction)
+		cur = self.db.execute(stat)
 		for data in cur.fetchall():
-			dev = Device(type=data[0], id=data[1], name=data[2], direction=data[3])
+			dev = Device(type=data[0], id=data[1], name=data[2])
 			devices.append(dev)
-			self.devices = devices
+		
+		self.devices = devices
 		
 		return self.devices
