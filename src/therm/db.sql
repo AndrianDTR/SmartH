@@ -53,7 +53,7 @@ DROP TABLE IF EXISTS `DevicesState`;
 CREATE TABLE IF NOT EXISTS `DevicesState` (
   `Key` int(10) unsigned NOT NULL,
   `DeviceId` bigint(20) unsigned NOT NULL,
-  `Value` int(10) DEFAULT NULL,
+  `Value` FLOAT(10) NULL DEFAULT '9999',
   UNIQUE KEY `Id` (`DeviceId`),
   KEY `FK_DevicesState_1wDevices` (`Key`,`DeviceId`),
   CONSTRAINT `FK_DevicesState_1wDevices` FOREIGN KEY (`Key`, `DeviceId`) REFERENCES `1wDevices` (`Type`, `DeviceId`)
