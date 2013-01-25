@@ -9,12 +9,7 @@ from daemon import Daemon
 
 class MyDaemon(Daemon):
 	devices = None
-	"""
-	pidfile = None
-	stdin = None
-	stdout = None
-	stderr = None
-	#"""
+
 	def __init__(self, pidfile):
 		Daemon.__init__(self, pidfile, )
 		db = DB()

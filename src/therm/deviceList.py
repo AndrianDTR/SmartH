@@ -13,16 +13,14 @@ class DeviceList(Singleton):
 		self.db = DB()
 	
 	def clearDeviceTypes(self):
-		print "Clear dev types"
-		pass
+		self.db.execute("delete from `DeviceTypes`")
 
 	def clearDeviceValues(self):
-		print "Clear dev values"
-		pass	
+		self.db.execute("delete from `DeviceValues`")
 
 	def refreshDeviceTypes(self):
 		w1Types = []
-
+		
 		path = os.path.dirname(os.path.abspath(__file__))
 		for py in [f[:-3] for f in os.listdir(path) if f.startswith('ds') and f.endswith('.py')]:
 			cls = str(py).upper()
