@@ -40,10 +40,7 @@ while($u = db_fetch($res))
 		if($cnt == 0)
 			$row[$cnt] = '"'.$field.'"';
 		else
-			if($field > 150)
-				$row[$cnt] = 0.0001;
-			else
-				$row[$cnt] = $field;
+			$row[$cnt] = $field;
 		
 		$cnt++;
 	}
