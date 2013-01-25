@@ -32,9 +32,9 @@ foreach($sensors as $sensor)
 
 $prow = array();
 $values = array();
-$query .= substr($fields,0,-2).$from." group by t1.TimeMark";
+$query .= substr($fields,0,-2).$from." where t1.TimeMark > TIMESTAMPADD(HOUR,-2,NOW()) group by t1.TimeMark";
 
-//echo($query);
+echo($query);
 
 $rcnt = 0;
 $res = db_query($query);
@@ -66,7 +66,7 @@ while($u = db_fetch($res))
 	$rcnt++;
 }
 
-//echo("<BR>$rcnt");
+echo("<BR>$rcnt");
 /*
 select t1.TimeMark T, IFNULL(t2.Value, -100) V2, IFNULL(t3.Value, -100) V3, IFNULL(t4.Value, -100) V4, IFNULL(t5.Value, -100) V5 from DeviceValues t1 left join DeviceValues t2 on t2.Type=40 and t2.Deviceid=74782089 and t1.TimeMark=t2.TimeMark left join DeviceValues t3 on t3.Type=40 and t3.Deviceid=74782090 and t1.TimeMark=t3.TimeMark left join DeviceValues t4 on t4.Type=40 and t4.Deviceid=74782091 and t1.TimeMark=t4.TimeMark left join DeviceValues t5 on t5.Type=40 and t5.Deviceid=74782092 and t1.TimeMark=t5.TimeMark group by t1.TimeMark
 */
