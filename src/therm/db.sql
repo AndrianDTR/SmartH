@@ -53,7 +53,7 @@ DROP TABLE IF EXISTS `DevicesState`;
 CREATE TABLE IF NOT EXISTS `DevicesState` (
   `Key` int(10) unsigned NOT NULL,
   `DeviceId` bigint(20) unsigned NOT NULL,
-  `Value` FLOAT(10) NULL DEFAULT '9999',
+  `Value` FLOAT(10) NULL DEFAULT '0.0001',
   UNIQUE KEY `Id` (`DeviceId`),
   KEY `FK_DevicesState_1wDevices` (`Key`,`DeviceId`),
   CONSTRAINT `FK_DevicesState_1wDevices` FOREIGN KEY (`Key`, `DeviceId`) REFERENCES `1wDevices` (`Type`, `DeviceId`)
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `DeviceValues` (
   `Type` int(10) unsigned DEFAULT NULL,
   `DeviceId` bigint(20) unsigned DEFAULT NULL,
   `TimeMark` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `Value` int(10) unsigned DEFAULT NULL,
+  `Value` FLOAT(10) NULL DEFAULT '0.0001',
   KEY `FK_DeviceValues_1wDevices` (`Type`,`DeviceId`),
   CONSTRAINT `FK_DeviceValues_1wDevices` FOREIGN KEY (`Type`, `DeviceId`) REFERENCES `1wDevices` (`Type`, `DeviceId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
