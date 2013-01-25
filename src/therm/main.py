@@ -37,7 +37,7 @@ class MyDaemon(Daemon):
 		
 		for row in devList:
 			stat = "insert into `DeviceValues`(`Type`, `DeviceId`, `Value`) values({0}, {1}, {2})".format(row.type, row.id, row.getValue())
-			print str(row), row.getValue()
+			#print str(row), row.getValue()
 			db.execute(stat)
 		db.sync()
 		
