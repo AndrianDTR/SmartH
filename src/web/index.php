@@ -90,7 +90,7 @@ select t1.TimeMark T, IFNULL(t2.Value, -100) V2, IFNULL(t3.Value, -100) V3, IFNU
         ]);
 
         var options = {
-          title: 'Company Performance'
+          title: 'Temperature chart'
         };
 
         var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
