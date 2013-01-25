@@ -54,7 +54,7 @@ class MyDaemon(Daemon):
 				except MyError as e:
 					print e
 				
-				if count == 59:
+				if count == 4:
 					count = 0
 				else:
 					count += 1
@@ -75,6 +75,16 @@ class MyDaemon(Daemon):
 			self.devices.renewDevicesList()
 		except MyError as e:
 			print e
+	
+	def clear(self):
+		try:
+			self.devices = DeviceList()
+			self.devices.clearDeviceValues()
+			self.devices.clearDeviceTypes()
+			self.refresh()
+		except MyError as e:
+			print e
+
 		
 if __name__ == "__main__":
 	daemon = MyDaemon('/tmp/thermd.pid', )
@@ -87,10 +97,12 @@ if __name__ == "__main__":
 			daemon.restart()
 		elif 'refresh' == sys.argv[1]:
 			daemon.refresh()
+		elif 'clear' == sys.argv[1]:
+			daemon.clear()
 		else:
-			print "Unknown command.\nUsage: main.py start|stop|restart|refresh"
+			print "Unknown command.\nUsage: main.py start|stop|restart|refresh|clear"
 			sys.exit(2)
 		sys.exit(0)
 	else:
-		print "usage: {0} start|stop|restart|refresh".format(sys.argv[0])
+		print "usage: {0} start|stop|restart|refresh|clear".format(sys.argv[0])
 		sys.exit(2)
