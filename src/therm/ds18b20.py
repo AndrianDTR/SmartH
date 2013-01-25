@@ -27,14 +27,14 @@ class DS18B20():
 	def getValue(self, id):
 		devId = hex(self.__type)[2:] + "-" + id
 		filename="/sys/bus/w1/devices/"+devId+"/w1_slave"
-		temperature = 9999
+		temperature = 0.0001
 		try:
 			with open(filename, 'r') as tfile:
 				text = tfile.read()
 				secondline = text.split("\n")[1]
 				temperaturedata= secondline.split(" ")[9]
 				temperature = float(temperaturedata[2:])
-				temperature = temperature / 1000
+				temperature = temperature / 1000.0
 		except IOError:
 			print "Error! Reading device '{0}' was failed.".format(devId)
 		
