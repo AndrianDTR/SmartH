@@ -17,6 +17,7 @@ class DeviceList(Singleton):
 
 	def clearDeviceValues(self):
 		self.db.execute("delete from `DeviceValues`")
+		self.db.execute("delete from `1wDevices`")
 
 	def refreshDeviceTypes(self):
 		w1Types = []

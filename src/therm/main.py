@@ -49,7 +49,7 @@ class MyDaemon(Daemon):
 				except MyError as e:
 					print e
 				
-				if count == 4:
+				if count == 59:
 					count = 0
 				else:
 					count += 1
